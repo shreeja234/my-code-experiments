@@ -1,8 +1,7 @@
 name: Auto Assign Jira Issues
 
 on:
-  schedule:
-    - cron: '1 * * * *' # Runs every hour
+  workflow_dispatch:
 
 jobs:
   auto_assign:
