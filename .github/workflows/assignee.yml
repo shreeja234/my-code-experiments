@@ -12,7 +12,7 @@ jobs:
 
       - name: Assign unassigned Jira issues
         run: |
-          ASSIGNEE="712020:b2c12845-526d-4d33-9799-86e886786b8a"
+          ASSIGNEE="712020:8357fd07-8d72-45e3-bdc7-c03e2f83844d"
           JIRA_BASE_URL="https://infinityink.atlassian.net"
           JIRA_USERNAME="shreejaj@devtools.in"
           JIRA_API_TOKEN="ATATT3xFfGF0X5h7NLWrup3oy6tkrevcBXTk8oII1NWCkZjXSN1kEEIGzFLLc3KUSICj9KxUJ5hsOD0lThCyp8GLbrdtEHjqeyG8_YZA6Y3psL6JpPJohpxmsa_051WiZom9ToQdCYLza8ZFFnU7SS6l1XlqyIGshiC9KDxOD8NukvF9jmx-UGY=A53BFDBF"
