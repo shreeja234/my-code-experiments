@@ -16,7 +16,7 @@ jobs:
           JIRA_BASE_URL="https://infinityink.atlassian.net"
           JIRA_USERNAME="shreejaj@devtools.in"
           JIRA_API_TOKEN="ATATT3xFfGF0X5h7NLWrup3oy6tkrevcBXTk8oII1NWCkZjXSN1kEEIGzFLLc3KUSICj9KxUJ5hsOD0lThCyp8GLbrdtEHjqeyG8_YZA6Y3psL6JpPJohpxmsa_051WiZom9ToQdCYLza8ZFFnU7SS6l1XlqyIGshiC9KDxOD8NukvF9jmx-UGY=A53BFDBF"
-          
+
           # Fetch unassigned issues
           RESPONSE=$(curl -u $JIRA_USERNAME:$JIRA_API_TOKEN \
             -X GET \
@@ -30,18 +30,23 @@ jobs:
           echo "$RESPONSE" > issues.json
 
           # Check if issues.json contains any issues
-          ISSUE_KEYS=$(jq -r '.issues[].key' issues.json)
-          if [ -z "$ISSUE_KEYS" ]; then
+          if jq -e '.issues | length == 0' issues.json > /dev/null; then
             echo "No unassigned issues found."
             exit 0
           fi
 
+          # Extract issue keys
+          ISSUE_KEYS=$(jq -r '.issues[].key' issues.json)
+
           # Assign issues
           for ISSUE_KEY in $ISSUE_KEYS; do
             echo "Assigning issue $ISSUE_KEY to $ASSIGNEE"
-            curl -u $JIRA_USERNAME:$JIRA_API_TOKEN \
+            ASSIGN_RESPONSE=$(curl -u $JIRA_USERNAME:$JIRA_API_TOKEN \
               -X PUT \
               -H "Content-Type: application/json" \
-              -d "{\"fields\":{\"assignee\":{\"name\":\"$ASSIGNEE\"}}}" \
-              "$JIRA_BASE_URL/rest/api/3/issue/$ISSUE_KEY"
+              -d "{\"fields\":{\"assignee\":{\"id\":\"$ASSIGNEE\"}}}" \
+              "$JIRA_BASE_URL/rest/api/3/issue/$ISSUE_KEY")
+
+            # Output the assign response for debugging
+            echo "Assign response: $ASSIGN_RESPONSE"
           done
