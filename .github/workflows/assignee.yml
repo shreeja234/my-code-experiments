@@ -2,7 +2,7 @@ name: Auto Assign Jira Issues
 
 on:
   schedule:
-    - cron: '0 * * * *' # Runs every hour
+    - cron: '1 * * * *' # Runs every hour
 
 jobs:
   auto_assign:
