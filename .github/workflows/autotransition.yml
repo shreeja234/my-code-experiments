@@ -1,0 +1,41 @@
+name: Auto Transition Jira Issues
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Every hour
+
+jobs:
+  transition-issues:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Fetch and Transition Jira Issues
+        env:
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_URL: ${{ secrets.JIRA_URL }}
+          JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
+          JIRA_TRANSITION_ID: 11  # Replace with the actual transition ID for "In Progress"
+        run: |
+          # Fetch issues in Open status
+          issues=$(curl -s -u $JIRA_EMAIL:$JIRA_API_TOKEN \
+            -X GET \
+            -H "Content-Type: application/json" \
+            "$JIRA_URL/rest/api/2/search?jql=project=$JIRA_PROJECT_KEY+AND+status=Open" \
+            | jq -r '.issues[].key')
+
+          # Transition each issue
+          for issue in $issues; do
+            echo "Transitioning issue $issue to In Progress"
+            curl -s -u $JIRA_EMAIL:$JIRA_API_TOKEN \
+              -X POST \
+              -H "Content-Type: application/json" \
+              -d "{\"transition\": {\"id\": \"$JIRA_TRANSITION_ID\"}}" \
+              "$JIRA_URL/rest/api/2/issue/$issue/transitions"
+          done
