@@ -15,7 +15,7 @@ jobs:
           ASSIGNEE="712020:8357fd07-8d72-45e3-bdc7-c03e2f83844d"
           JIRA_BASE_URL="https://infinityink.atlassian.net"
           JIRA_USERNAME="shreejaj@devtools.in"
-          JIRA_API_TOKEN="ATATT3xFfGF0X5h7NLWrup3oy6tkrevcBXTk8oII1NWCkZjXSN1kEEIGzFLLc3KUSICj9KxUJ5hsOD0lThCyp8GLbrdtEHjqeyG8_YZA6Y3psL6JpPJohpxmsa_051WiZom9ToQdCYLza8ZFFnU7SS6l1XlqyIGshiC9KDxOD8NukvF9jmx-UGY=A53BFDBF"
+          JIRA_API_TOKEN="ATATT3xFfGF0Vccy6uLJ-bGye9QbDcvWaRFYTkeRK6bDxgjWcheFHndOzRDSeggLaq6pE7Rd96WypHGvZaODIKEA4Q0r8A8qxSUK5EO07IfglHibdrNsT-rQ93Ex4eF33AkVXE7CIMN46EPkzFEmZyGmCilwk674VAiWUZtk0CB1dTeyqlc-bTI=0DC450D4"
           PROJECT_KEY="TT"
 
           # Fetch unassigned issues
