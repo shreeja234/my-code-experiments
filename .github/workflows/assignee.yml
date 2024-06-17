@@ -16,7 +16,7 @@ jobs:
           JIRA_BASE_URL="https://infinityink.atlassian.net"
           JIRA_USERNAME="shreejaj@devtools.in"
           JIRA_API_TOKEN="ATATT3xFfGF0X5h7NLWrup3oy6tkrevcBXTk8oII1NWCkZjXSN1kEEIGzFLLc3KUSICj9KxUJ5hsOD0lThCyp8GLbrdtEHjqeyG8_YZA6Y3psL6JpPJohpxmsa_051WiZom9ToQdCYLza8ZFFnU7SS6l1XlqyIGshiC9KDxOD8NukvF9jmx-UGY=A53BFDBF"
-          PROJECT_KEY="FB"
+          PROJECT_KEY="TT"
 
           # Fetch unassigned issues
           RESPONSE=$(curl -u $JIRA_USERNAME:$JIRA_API_TOKEN \
