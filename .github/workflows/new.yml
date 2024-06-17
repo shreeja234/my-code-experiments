@@ -1,0 +1,32 @@
+name: Auto Transition Jira Issues
+
+on:
+  schedule:
+    # Run every hour
+    - cron: '0 * * * *'
+
+jobs:
+  transition-issues:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v2
+
+    - name: Transition Jira Issues
+      env:
+        JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+        JIRA_URL: ${{ secrets.JIRA_URL }}
+        JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
+      run: |
+        curl -s -u $JIRA_EMAIL:$JIRA_API_TOKEN \
+          -X GET \
+          -H "Content-Type: application/json" \
+          "$JIRA_URL/rest/api/2/search?jql=project=$JIRA_PROJECT_KEY+AND+status=Open" \
+          | jq '.issues[].key' \
+          | xargs -I {} curl -s -u $JIRA_EMAIL:$JIRA_API_TOKEN \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -d '{"transition": {"id": "11"}}' \
+            "$JIRA_URL/rest/api/2/issue/{}/transitions"
