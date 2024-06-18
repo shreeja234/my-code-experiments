@@ -25,7 +25,7 @@ jobs:
           RESPONSE=$(curl -u $JIRA_USERNAME:$JIRA_API_TOKEN \
             -X GET \
             -H "Content-Type: application/json" \
-            "$JIRA_BASE_URL/rest/api/3/search?jql=project=YOUR_PROJECT_KEY")
+            "$JIRA_BASE_URL/rest/api/3/search?jql=project=TT")
 
           # Output the response for debugging
           echo "Jira API response: $RESPONSE"
