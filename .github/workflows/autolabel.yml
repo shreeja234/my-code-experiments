@@ -1,0 +1,50 @@
+name: Add Timestamp Label to Jira Issues
+
+on:
+  workflow_dispatch:
+
+jobs:
+  add_label:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Add timestamp label to Jira issues
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USERNAME: ${{ secrets.JIRA_USERNAME }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        run: |
+          # Get the current timestamp
+          TIMESTAMP=$(date +'%Y-%m-%d-%H-%M-%S')
+          LABEL="timestamp-$TIMESTAMP"
+
+          # Fetch issues from the Jira project
+          RESPONSE=$(curl -u $JIRA_USERNAME:$JIRA_API_TOKEN \
+            -X GET \
+            -H "Content-Type: application/json" \
+            "$JIRA_BASE_URL/rest/api/3/search?jql=project=YOUR_PROJECT_KEY")
+
+          # Output the response for debugging
+          echo "Jira API response: $RESPONSE"
+
+          # Save the response to issues.json
+          echo "$RESPONSE" > issues.json
+
+          # Extract issue keys
+          ISSUE_KEYS=$(jq -r '.issues[].key' issues.json)
+
+          # Add label to issues
+          for ISSUE_KEY in $ISSUE_KEYS; do
+            echo "Adding label $LABEL to issue $ISSUE_KEY"
+            ADD_LABEL_RESPONSE=$(curl -u $JIRA_USERNAME:$JIRA_API_TOKEN \
+              -X PUT \
+              -H "Content-Type: application/json" \
+              -d "{\"update\": {\"labels\": [{\"add\": \"$LABEL\"}]}}" \
+              "$JIRA_BASE_URL/rest/api/3/issue/$ISSUE_KEY")
+
+            # Output the add label response for debugging
+            echo "Add label response: $ADD_LABEL_RESPONSE"
+          done
