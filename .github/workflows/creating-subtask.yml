@@ -15,7 +15,7 @@ jobs:
           JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
         run: |
           # Define the issue ID and custom field value
-          ISSUE_ID=$(jq -r '.issue.id' < $GITHUB_EVENT_PATH)
+          ISSUE_ID=TT-42(jq -r '.issue.id' < $GITHUB_EVENT_PATH)
           TEAM_AVAILABLE=$(jq -r '.issue.fields.customfield_10063' < $GITHUB_EVENT_PATH)  # replace customfield_12345 with your actual custom field ID
 
           # Check if the 'team available' field is set to 'Yes'
