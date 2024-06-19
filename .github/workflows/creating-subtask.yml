@@ -8,54 +8,54 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Check for custom field change
+        id: check_custom_field
+        uses: atlassian/gajira-check-issue@master
+        with:
+          server-url: 'https://infinityink.atlassian.net'
+          issue-key: 'TT-41'
+          jira-user-email: ${{ secrets.JIRA_USER_EMAIL }}
+          api-token: ${{ secrets.JIRA_API_TOKEN }}
 
-      - name: Trigger Jira subtask creation
-        env:
-          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-          JIRA_BASE_URL: 'https://infinityink.atlassian.net'  # Replace with your Jira instance URL
+      - name: Create subtasks if necessary
+        if: steps.check_custom_field.outputs.custom_field_value == 'Yes'
         run: |
-          # Extract necessary information (issue key, custom field value, etc.) from your workflow trigger event
-          # You might need to parse this information from the payload or use GitHub Actions context
-
-          # Example script to create subtasks using Jira REST API
+          # Script to create subtasks using Jira REST API
           issueKey="TT-41"
-          customFieldValue="yes"
+          subtaskSummary1="Subtask 1"
+          subtaskSummary2="Subtask 2"
+          apiUrl="https://infinityink.atlassian.net/rest/api/2/issue/"
 
-          # Use curl or any HTTP client to interact with Jira API
-          # Replace with actual API endpoint and payload
+          # Create subtask 1
           curl -X POST \
-            -H "Authorization: Basic $(echo -n your_jira_username:$JIRA_API_TOKEN | base64)" \
+            -H "Authorization: Basic $(echo -n ${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }} | base64)" \
             -H "Content-Type: application/json" \
             -d '{
               "fields": {
                 "parent": {
                   "key": "'"TT-41"'"
                 },
-                "summary": "Subtask 1",
-                "description": "Description of Subtask 1",
+                "summary": "'"$subtaskSummary1"'",
                 "issuetype": {
                   "name": "Sub-task"
                 }
               }
             }' \
-            "$JIRA_BASE_URL/rest/api/2/issue/"
+            "$apiUrl"
 
+          # Create subtask 2
           curl -X POST \
-            -H "Authorization: Basic $(echo -n your_jira_username:$JIRA_API_TOKEN | base64)" \
+            -H "Authorization: Basic $(echo -n ${{ secrets.JIRA_USER_EMAIL }}:${{ secrets.JIRA_API_TOKEN }} | base64)" \
             -H "Content-Type: application/json" \
             -d '{
               "fields": {
                 "parent": {
                   "key": "'"TT-41"'"
                 },
-                "summary": "Subtask 2",
-                "description": "Description of Subtask 2",
+                "summary": "'"$subtaskSummary2"'",
                 "issuetype": {
                   "name": "Sub-task"
                 }
               }
             }' \
-            "$JIRA_BASE_URL/rest/api/2/issue/"
-
+            "$apiUrl"
