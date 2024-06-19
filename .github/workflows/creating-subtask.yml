@@ -1,53 +1,61 @@
-name: Create Subtask on Custom Field Change
+name: Create Jira Subtasks
 
 on:
   workflow_dispatch:
 
 jobs:
-  create-subtask:
+  create-subtasks:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Check if custom field changed to desired value
-        id: check_custom_field
-        uses: actions/github-script@v4
-        with:
-          script: |
-            const payload = context.payload;
-            const desiredCustomFieldValue = 'YourDesiredValue'; // Replace with your desired custom field value
-            const customFieldValue = payload.changes?.customfield_10063?.newValue; // Adjust the field ID as per your Jira setup
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-            if (customFieldValue === desiredCustomFieldValue) {
-              console.log(`Custom field value changed to ${customFieldValue}. Proceeding to create subtask...`);
-              return customFieldValue;
-            } else {
-              console.log(`Custom field value is ${customFieldValue}. No action required.`);
-              return null;
-            }
-
-      - name: Create Jira subtask
-        if: steps.check_custom_field.outputs == 'YourDesiredValue'
+      - name: Trigger Jira subtask creation
         env:
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-          JIRA_BASE_URL: 'https://your-jira-instance.atlassian.net/rest/api/3'
+          JIRA_BASE_URL: 'https://infinityink.atlassian.net'  # Replace with your Jira instance URL
         run: |
-          ISSUE_ID=$(jq -r '.issue.id' < $GITHUB_EVENT_PATH)
-          JIRA_ISSUE_KEY=$(curl -s --request POST \
-            --url "$JIRA_BASE_URL/issue" \
-            --header 'Authorization: Basic '$JIRA_API_TOKEN \
-            --header 'Accept: application/json' \
-            --header 'Content-Type: application/json' \
-            --data '{
+          # Extract necessary information (issue key, custom field value, etc.) from your workflow trigger event
+          # You might need to parse this information from the payload or use GitHub Actions context
+
+          # Example script to create subtasks using Jira REST API
+          issueKey="TT-41"
+          customFieldValue="yes"
+
+          # Use curl or any HTTP client to interact with Jira API
+          # Replace with actual API endpoint and payload
+          curl -X POST \
+            -H "Authorization: Basic $(echo -n your_jira_username:$JIRA_API_TOKEN | base64)" \
+            -H "Content-Type: application/json" \
+            -d '{
               "fields": {
-                "project": {
-                  "key": "TT"
-                },
                 "parent": {
-                  "id": "10007"
+                  "key": "'"TT-41"'"
                 },
-                "summary": "Subtask summary",
+                "summary": "Subtask 1",
+                "description": "Description of Subtask 1",
                 "issuetype": {
-                  "id": "10008"
+                  "name": "Sub-task"
                 }
               }
-            }' | jq -r '.key')
-          echo "Created subtask with key $JIRA_ISSUE_KEY"
+            }' \
+            "$JIRA_BASE_URL/rest/api/2/issue/"
+
+          curl -X POST \
+            -H "Authorization: Basic $(echo -n your_jira_username:$JIRA_API_TOKEN | base64)" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "fields": {
+                "parent": {
+                  "key": "'"TT-41"'"
+                },
+                "summary": "Subtask 2",
+                "description": "Description of Subtask 2",
+                "issuetype": {
+                  "name": "Sub-task"
+                }
+              }
+            }' \
+            "$JIRA_BASE_URL/rest/api/2/issue/"
+
