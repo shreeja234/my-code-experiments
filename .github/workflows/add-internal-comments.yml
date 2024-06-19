@@ -1,9 +1,7 @@
 name: Add Comment to Jira Issue
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   add-jira-comment:
