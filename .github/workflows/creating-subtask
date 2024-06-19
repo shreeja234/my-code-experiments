@@ -1,0 +1,39 @@
+name: Create Jira Subtasks
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-jira-subtasks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check 'team available' field and create subtasks if applicable
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
+        run: |
+          # Define the issue ID and custom field value
+          ISSUE_ID=$(jq -r '.issue.id' < $GITHUB_EVENT_PATH)
+          TEAM_AVAILABLE=$(jq -r '.issue.fields.customfield_10063' < $GITHUB_EVENT_PATH)  # replace customfield_12345 with your actual custom field ID
+
+          # Check if the 'team available' field is set to 'Yes'
+          if [ "$TEAM_AVAILABLE" = "Yes" ]; then
+            # Define subtask details
+            SUBTASKS=(
+              '{"fields": {"project": {"key": "'"$JIRA_PROJECT_KEY"'"}, "parent": {"id": "'"$ISSUE_ID"'"}, "summary": "Subtask 1", "issuetype": {"name": "Sub-task"}}}'
+              '{"fields": {"project": {"key": "'"$JIRA_PROJECT_KEY"'"}, "parent": {"id": "'"$ISSUE_ID"'"}, "summary": "Subtask 2", "issuetype": {"name": "Sub-task"}}}'
+            )
+
+            # Create subtasks in Jira
+            for SUBTASK in "${SUBTASKS[@]}"; do
+              curl -s -X POST \
+                -H "Authorization: Basic $(echo -n $JIRA_USER_EMAIL:$JIRA_API_TOKEN | base64)" \
+                -H "Content-Type: application/json" \
+                --data "$SUBTASK" \
+                "$JIRA_BASE_URL/rest/api/2/issue"
+            done
+          else
+            echo "Custom field 'team available' is not set to 'Yes'. No subtasks will be created."
+          fi
