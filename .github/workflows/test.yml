@@ -1,0 +1,21 @@
+name: Link PR to Jira Issue
+
+on:
+   workflow_dispatch:
+
+jobs:
+  link-pr-to-jira:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Link pull request to Jira issue
+      uses: atlassian/gajira-create-link@v3
+      with:
+        issue: FB-137
+        type: "relates to"
+        url: ${{ github.event.pull_request.html_url }}
+        title: "Pull Request: ${{ github.event.pull_request.title }}"
+      env:
+        JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+        JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+        JIRA_URL: ${{ secrets.JIRA_URL }}
